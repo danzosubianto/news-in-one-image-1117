@@ -34,12 +34,15 @@ function burst(cv: Canvas, cx: number, cy: number, r: number, color: Rgb) {
 function drawBridge(cv: Canvas, x: number, y: number, w: number, h: number) {
   const ink: Rgb = [38, 44, 52];
   cv.rect(x, y, w, h, [206, 219, 226]); // pale sky
+  cv.rect(x, y, w, h * 0.3, [220, 230, 234]); // lighter band high in the sky
   cv.circle(x + w * 0.1, y + h * 0.16, h * 0.08, [240, 200, 90]); // low sun, clear of the smoke
   const seaY = y + h * 0.68;
   cv.rect(x, seaY, w, y + h - seaY, [43, 96, 110]); // the strait
   // wavelets
   cv.polyline(arc(x + w * 0.2, seaY + h * 0.12, w * 0.05, h * 0.02, Math.PI, Math.PI * 2), 2.5, [120, 170, 180]);
   cv.polyline(arc(x + w * 0.72, seaY + h * 0.18, w * 0.06, h * 0.02, Math.PI, Math.PI * 2), 2.5, [120, 170, 180]);
+  cv.polyline(arc(x + w * 0.45, seaY + h * 0.24, w * 0.045, h * 0.018, Math.PI, Math.PI * 2), 2.2, [120, 170, 180]);
+  cv.polyline(arc(x + w * 0.88, seaY + h * 0.1, w * 0.04, h * 0.018, Math.PI, Math.PI * 2), 2.2, [120, 170, 180]);
 
   const deckY = y + h * 0.52;
   // pylons
@@ -68,12 +71,21 @@ function drawBridge(cv: Canvas, x: number, y: number, w: number, h: number) {
     ],
     ink,
   );
+  // foam where the span went in
+  cv.polyline(arc(x + w * 0.52, seaY + h * 0.05, w * 0.09, h * 0.03, Math.PI, Math.PI * 2), 2.4, [225, 238, 240]);
+  cv.polyline(arc(x + w * 0.6, seaY + h * 0.12, w * 0.05, h * 0.02, Math.PI, Math.PI * 2), 2, [225, 238, 240]);
+  // the second day's incoming: one streak angling down at the break,
+  // its head still bright above the burst
+  cv.segment(x + w * 0.34, y + h * 0.08, x + w * 0.48, deckY - h * 0.12, 2, [250, 250, 248]);
+  cv.circle(x + w * 0.485, deckY - h * 0.13, h * 0.022, [255, 255, 252]);
   // the strike itself, and smoke above it
-  burst(cv, x + w * 0.52, deckY - h * 0.02, h * 0.13, [232, 116, 32]);
-  burst(cv, x + w * 0.52, deckY - h * 0.02, h * 0.07, [248, 190, 60]);
+  burst(cv, x + w * 0.52, deckY - h * 0.02, h * 0.15, [232, 116, 32]);
+  burst(cv, x + w * 0.52, deckY - h * 0.02, h * 0.08, [248, 190, 60]);
   cv.circle(x + w * 0.47, deckY - h * 0.18, h * 0.07, [120, 124, 128]);
   cv.circle(x + w * 0.55, deckY - h * 0.26, h * 0.09, [140, 144, 148]);
   cv.circle(x + w * 0.44, deckY - h * 0.3, h * 0.055, [160, 164, 168]);
+  cv.circle(x + w * 0.62, deckY - h * 0.33, h * 0.065, [152, 156, 160]);
+  cv.circle(x + w * 0.68, deckY - h * 0.27, h * 0.045, [168, 172, 176]);
 }
 
 // ---- A tanker and a mine in the strait -------------------------------
@@ -106,6 +118,20 @@ function drawShip(cv: Canvas, x: number, y: number, w: number, h: number) {
   // bridge tower and funnel
   cv.rect(x + w * 0.74, hullY - h * 0.3, w * 0.09, h * 0.27, [238, 238, 240]);
   cv.rect(x + w * 0.755, hullY - h * 0.38, w * 0.035, h * 0.09, [30, 32, 38]);
+  // smoke curling from the funnel
+  cv.circle(x + w * 0.78, hullY - h * 0.44, h * 0.035, [150, 154, 158]);
+  cv.circle(x + w * 0.82, hullY - h * 0.5, h * 0.05, [168, 172, 176]);
+  cv.circle(x + w * 0.87, hullY - h * 0.55, h * 0.04, [184, 188, 192]);
+  // portholes along the hull
+  for (let i = 0; i < 5; i++) {
+    cv.circle(x + w * (0.22 + i * 0.11), hullY + h * 0.07, h * 0.016, [200, 214, 218]);
+  }
+  // the wake at the stern
+  cv.polyline(arc(x + w * 0.1, seaY + h * 0.22, w * 0.07, h * 0.02, Math.PI, Math.PI * 2), 2.2, [225, 238, 240]);
+  // a second mine, smaller and farther off
+  cv.circle(x + w * 0.3, seaY + h * 0.26, h * 0.032, [22, 24, 28]);
+  cv.segment(x + w * 0.3 - h * 0.05, seaY + h * 0.26, x + w * 0.3 + h * 0.05, seaY + h * 0.26, 2, [22, 24, 28]);
+  cv.segment(x + w * 0.3, seaY + h * 0.26 - h * 0.05, x + w * 0.3, seaY + h * 0.26 + h * 0.05, 2, [22, 24, 28]);
   // the mine, close in the foreground
   const mx = x + w * 0.84;
   const my = seaY + h * 0.16;
@@ -124,6 +150,9 @@ function drawGlobe(cv: Canvas, x: number, y: number, w: number, h: number) {
   const cy = y + h / 2;
   const r = Math.min(w, h) * 0.4;
   cv.circle(cx, cy, r, [52, 116, 178]);
+  // light from the upper left, shade gathering lower right
+  cv.disc(cx - r * 0.34, cy - r * 0.36, r * 0.52, [96, 152, 204]);
+  cv.disc(cx + r * 0.42, cy + r * 0.44, r * 0.55, [40, 98, 156]);
   // continents, deliberately schematic
   cv.polygon(
     [
@@ -202,8 +231,34 @@ function drawLeaf(cv: Canvas, x: number, y: number, w: number, h: number) {
     leafPts.push([x + w * (0.18 + 0.56 * t), y + h * (0.78 - 0.52 * t) + Math.sin(t * Math.PI) * h * 0.16]);
   }
   cv.polygon(leafPts, [52, 140, 74]);
-  // its vein
+  // its vein, and the side veins branching off it
   cv.segment(x + w * 0.2, y + h * 0.76, x + w * 0.72, y + h * 0.28, 3, [30, 96, 46]);
+  for (const t of [0.3, 0.52, 0.74]) {
+    const vx = x + w * (0.2 + 0.52 * t);
+    const vy = y + h * (0.76 - 0.48 * t);
+    cv.segment(vx, vy, vx - w * 0.1, vy - h * 0.09, 1.8, [30, 96, 46]);
+    cv.segment(vx, vy, vx + w * 0.09, vy + h * 0.02, 1.8, [30, 96, 46]);
+  }
+  // a young sprout at its foot: two small leaves on a stem
+  cv.segment(x + w * 0.82, y + h * 0.86, x + w * 0.82, y + h * 0.68, 2.6, [30, 96, 46]);
+  cv.polygon(
+    [
+      [x + w * 0.82, y + h * 0.7],
+      [x + w * 0.7, y + h * 0.62],
+      [x + w * 0.78, y + h * 0.56],
+      [x + w * 0.83, y + h * 0.64],
+    ],
+    [84, 168, 96],
+  );
+  cv.polygon(
+    [
+      [x + w * 0.82, y + h * 0.7],
+      [x + w * 0.94, y + h * 0.62],
+      [x + w * 0.86, y + h * 0.56],
+      [x + w * 0.81, y + h * 0.64],
+    ],
+    [84, 168, 96],
+  );
   // ground
   cv.rule(x + w * 0.08, y + h * 0.86, w * 0.84, 4, [90, 110, 84]);
 }
@@ -236,6 +291,11 @@ function drawTower(cv: Canvas, x: number, y: number, w: number, h: number) {
   // platforms cut back out in the sky colour
   cv.rect(cx - w * 0.13, y + h * 0.4, w * 0.26, h * 0.035, [228, 226, 234]);
   cv.rect(cx - w * 0.085, y + h * 0.24, w * 0.17, h * 0.03, [228, 226, 234]);
+  // a tricolour flying from the spire
+  cv.segment(cx, top, cx, top - h * 0.07, 2.2, ink);
+  cv.rect(cx, top - h * 0.07, w * 0.055, h * 0.06, [0, 85, 164]);
+  cv.rect(cx + w * 0.055, top - h * 0.07, w * 0.055, h * 0.06, [245, 245, 245]);
+  cv.rect(cx + w * 0.11, top - h * 0.07, w * 0.055, h * 0.06, [239, 65, 70]);
   // the crowd: heads and placards along the boulevard
   const heads: Rgb[] = [[196, 44, 52], [52, 92, 150], [226, 164, 32], [70, 130, 84], [120, 90, 150]];
   for (let row = 0; row < 2; row++) {
@@ -247,6 +307,8 @@ function drawTower(cv: Canvas, x: number, y: number, w: number, h: number) {
   }
   cv.rect(x + w * 0.16, base - h * 0.1, w * 0.13, h * 0.09, [245, 245, 245]);
   cv.segment(x + w * 0.225, base - h * 0.01, x + w * 0.225, base + h * 0.05, 2.5, ink);
+  cv.rect(x + w * 0.42, base - h * 0.13, w * 0.13, h * 0.09, [245, 245, 245]);
+  cv.segment(x + w * 0.485, base - h * 0.04, x + w * 0.485, base + h * 0.05, 2.5, ink);
   cv.rect(x + w * 0.68, base - h * 0.1, w * 0.13, h * 0.09, [245, 245, 245]);
   cv.segment(x + w * 0.745, base - h * 0.01, x + w * 0.745, base + h * 0.05, 2.5, ink);
   cv.rule(x + w * 0.05, base + h * 0.03, w * 0.9, 3, ink);
