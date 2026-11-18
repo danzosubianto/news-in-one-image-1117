@@ -16,6 +16,7 @@ export interface Story {
   headline: string;
   deck: string; // the short summary under the headline
   deckShort: string; // the deck cut to two lines for the inside pages
+  caption?: string; // a picture caption, for the story that carries art large
   art: string; // which illustration in art.ts belongs to this story
 }
 
@@ -34,6 +35,7 @@ export const LEAD: Story = {
     "Ukrainian missiles and drones partly collapsed a span of the Kerch Strait bridge, Crimea's lifeline to Russia, in a second straight day of strikes. " +
     "Zelensky hailed an 'unprecedented' attack; Moscow said it downed 1,441 drones.",
   deckShort: '',
+  caption: "The Kerch Strait bridge, Crimea's lifeline to Russia, hit for a second day.",
   art: 'bridge',
 };
 

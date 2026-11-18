@@ -102,9 +102,13 @@ function leadStory(yTop: number): number {
   const bodyY = yTop + 162;
   const artW = 340;
   const artX = W - MARGIN - artW;
-  drawArt(cv, LEAD.art, artX, bodyY, artW, 140);
+  const artH = 132;
+  drawArt(cv, LEAD.art, artX, bodyY, artW, artH);
+  // the picture's caption, ticked in the story's colour
+  cv.rect(artX, bodyY + artH + 6, 24, 2.2, LEAD.accent);
+  drawParagraph(cv, LEAD.caption ?? '', artX, bodyY + artH + 11, artW, { size: 10.5, weight: 2.6, color: MUTED }, 12.5);
   drawParagraph(cv, LEAD.deck, MARGIN, bodyY, artX - MARGIN - 26, { size: 17.5, weight: 3.4, color: BODY }, 26.5);
-  return bodyY + 148;
+  return bodyY + 168;
 }
 
 // Four figures from the day's reporting, set large in a ruled band.
@@ -123,7 +127,7 @@ function numbersBand(yTop: number): number {
     drawText(cv, stat.value, x, yTop + 56, { size: 27, weight: 7.4, color: RED });
     drawText(cv, stat.label, x, yTop + 73, { size: 12, weight: 2.7, color: MUTED });
   });
-  return yTop + 78;
+  return yTop + 74;
 }
 
 // One of the four inside stories: a square of spot art, then kicker,
@@ -151,7 +155,7 @@ function storyCard(story: Story, x: number, yTop: number, w: number): void {
 function storyGrid(yTop: number): number {
   const gap = 28;
   const colW = (COLW - gap) / 2;
-  const cardH = 128;
+  const cardH = 124;
   for (let row = 0; row < 2; row++) {
     for (let col = 0; col < 2; col++) {
       storyCard(STORIES[row * 2 + col], MARGIN + col * (colW + gap), yTop + row * cardH, colW);
@@ -207,9 +211,9 @@ y = leadStory(y + 5);
 cv.rule(MARGIN, y + 8, COLW, 1.6, INK);
 y = numbersBand(y + 14);
 cv.rule(MARGIN, y + 8, COLW, 1, FAINT);
-y = storyGrid(y + 14);
+y = storyGrid(y + 12);
 cv.rule(MARGIN, y + 8, COLW, 1, FAINT);
-y = briefsBand(y + 14);
+y = briefsBand(y + 12);
 
 // A closing double rule signs the page off, answering the masthead's.
 cv.rule(MARGIN, y + 12, COLW, 2.4, INK);
