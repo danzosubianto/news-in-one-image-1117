@@ -5,6 +5,10 @@
 // from news.ts, draws them with the stroke font and spot art in
 // src/, and writes the finished page to entry.png. It reads nothing,
 // asks nothing and rolls the same page off the press every time.
+//
+// The layout is budgeted like a real page: every band returns the y
+// it finished at, and the next band starts from there, so nothing
+// can drift into its neighbour.
 
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -29,180 +33,168 @@ const COLW = W - MARGIN * 2;
 
 const PAPER_BG: Rgb = [247, 243, 233];
 const INK: Rgb = [26, 26, 28];
+const BODY: Rgb = [52, 50, 46];
 const MUTED: Rgb = [104, 100, 90];
 const FAINT: Rgb = [172, 164, 148];
 const RED: Rgb = [172, 32, 40];
 
 const cv = new Canvas(W, H, PAPER_BG);
 
-// A centred dateline, the way the old broadsheets banner the day.
+// Top strip, the day bannered in red, the nameplate, the tagline,
+// and the double rule every broadsheet masthead sits on.
 function masthead(): number {
-  drawText(cv, 'EST. MMXXVI · ONE DAY, ONE PAGE', MARGIN, 30, {
+  drawText(cv, 'EST. MMXXVI · ONE DAY, ONE PAGE', MARGIN, 26, {
     size: 12.5,
     weight: 2.6,
     color: MUTED,
     tracking: 1.5,
   });
-  drawTextRight(cv, PAPER.edition, W - MARGIN, 30, {
+  drawTextRight(cv, PAPER.edition, W - MARGIN, 26, {
     size: 12.5,
     weight: 2.6,
     color: MUTED,
     tracking: 1,
   });
-  cv.rule(MARGIN, 42, COLW, 1.2, FAINT);
+  cv.rule(MARGIN, 38, COLW, 1.2, FAINT);
 
-  drawTextCentered(cv, PAPER.dateLine.toUpperCase(), W / 2, 82, {
-    size: 31,
-    weight: 6.4,
+  drawTextCentered(cv, PAPER.dateLine.toUpperCase(), W / 2, 70, {
+    size: 29,
+    weight: 6.2,
     color: RED,
     tracking: 3,
   });
-  drawTextCentered(cv, PAPER.name, W / 2, 148, {
-    size: 55,
+  drawTextCentered(cv, PAPER.name, W / 2, 133, {
+    size: 48,
     weight: 9.5,
     color: INK,
     tracking: 2,
   });
-  drawTextCentered(cv, PAPER.tagline, W / 2, 178, {
-    size: 15.5,
+  drawTextCentered(cv, PAPER.tagline, W / 2, 157, {
+    size: 15,
     weight: 3,
     color: MUTED,
     tracking: 1.5,
   });
-  cv.rule(MARGIN, 194, COLW, 3.4, INK);
-  cv.rule(MARGIN, 201, COLW, 1, INK);
-  return 201;
+  cv.rule(MARGIN, 171, COLW, 3.4, INK);
+  cv.rule(MARGIN, 178, COLW, 1, INK);
+  return 178;
 }
 
-// The lead story: kicker and a banner headline across the page, then
-// the deck in a column beside the spot art and its caption.
+// The lead story: kicker, a banner headline across the page, then
+// the deck in a column beside the spot art.
 function leadStory(yTop: number): number {
-  const kickerStyle: TextStyle = { size: 18, weight: 4.4, color: LEAD.accent, tracking: 2.5 };
-  drawText(cv, LEAD.kicker, MARGIN, yTop + 26, kickerStyle);
-  cv.rect(MARGIN, yTop + 36, 64, 3.4, LEAD.accent);
+  drawText(cv, LEAD.kicker, MARGIN, yTop + 30, {
+    size: 18,
+    weight: 4.4,
+    color: LEAD.accent,
+    tracking: 2.5,
+  });
+  cv.rect(MARGIN, yTop + 40, 64, 3.4, LEAD.accent);
 
-  const headStyle: TextStyle = { size: 53, weight: 8.6, color: INK, tracking: 0.5 };
-  const headLines = wrapText(LEAD.headline, COLW, headStyle);
-  let baseline = yTop + 100;
-  for (const line of headLines) {
+  const headStyle: TextStyle = { size: 43, weight: 8.6, color: INK, tracking: 0.5 };
+  let baseline = yTop + 90;
+  for (const line of wrapText(LEAD.headline, COLW, headStyle)) {
     drawText(cv, line, MARGIN, baseline, headStyle);
     baseline += 60;
   }
 
-  const bodyY = baseline - 60 + 34;
+  const bodyY = yTop + 174;
   const artW = 348;
   const artX = W - MARGIN - artW;
-  drawArt(cv, LEAD.art, artX, bodyY, artW, 178);
-  drawParagraph(
-    cv,
-    "The Kerch Strait bridge - Crimea's road and rail lifeline to Russia - under fire for a second day.",
-    artX,
-    bodyY + 186,
-    artW,
-    { size: 12.5, weight: 2.6, color: MUTED },
-    17,
-  );
-
-  const deckStyle: TextStyle = { size: 19.5, weight: 3.4, color: INK };
-  const deckBottom = drawParagraph(cv, LEAD.deck, MARGIN, bodyY, artX - MARGIN - 28, deckStyle, 28);
-  return Math.max(deckBottom, bodyY + 224) + 14;
+  drawArt(cv, LEAD.art, artX, bodyY, artW, 150);
+  drawParagraph(cv, LEAD.deck, MARGIN, bodyY, artX - MARGIN - 28, { size: 18, weight: 3.4, color: BODY }, 30);
+  return bodyY + 176;
 }
 
-// Four figures from the day's reporting, set large.
+// Four figures from the day's reporting, set large in a ruled band.
 function numbersBand(yTop: number): number {
-  drawText(cv, 'THE DAY IN NUMBERS', MARGIN, yTop + 16, {
+  drawText(cv, 'THE DAY IN NUMBERS', MARGIN, yTop + 22, {
     size: 14,
     weight: 4,
     color: INK,
     tracking: 2.5,
   });
-  cv.rule(MARGIN + 218, yTop + 11, COLW - 218, 1, FAINT);
+  cv.rule(MARGIN + 218, yTop + 17, COLW - 218, 1, FAINT);
   const colW = COLW / STATS.length;
   STATS.forEach((stat, i) => {
     const x = MARGIN + i * colW;
-    drawText(cv, stat.value, x, yTop + 62, { size: 37, weight: 7.5, color: RED });
-    drawParagraph(cv, stat.label, x, yTop + 74, colW - 22, { size: 13, weight: 2.7, color: MUTED }, 17.5);
+    drawText(cv, stat.value, x, yTop + 58, { size: 28, weight: 7.2, color: RED });
+    drawText(cv, stat.label, x, yTop + 76, { size: 13, weight: 2.7, color: MUTED });
   });
-  return yTop + 118;
+  return yTop + 82;
 }
 
 // One of the four inside stories: a square of spot art, then kicker,
-// headline and deck in the column beside it.
-function storyCard(story: Story, x: number, yTop: number, w: number): number {
-  const artSize = 108;
-  drawArt(cv, story.art, x, yTop, artSize, artSize);
-  const tx = x + artSize + 16;
-  const tw = w - artSize - 16;
-  drawText(cv, story.kicker, tx, yTop + 15, {
+// headline and the short deck in the column beside it.
+function storyCard(story: Story, x: number, yTop: number, w: number): void {
+  const artSize = 96;
+  drawArt(cv, story.art, x, yTop + 8, artSize, artSize);
+  const tx = x + artSize + 14;
+  const tw = w - artSize - 14;
+  drawText(cv, story.kicker, tx, yTop + 16, {
     size: 12,
     weight: 3.8,
     color: story.accent,
     tracking: 1.6,
   });
-  const headStyle: TextStyle = { size: 19.5, weight: 5.2, color: INK };
-  const lines = wrapText(story.headline, tw, headStyle);
-  let baseline = yTop + 42;
-  for (const line of lines.slice(0, 2)) {
+  const headStyle: TextStyle = { size: 17.5, weight: 5.2, color: INK };
+  let baseline = yTop + 40;
+  for (const line of wrapText(story.headline, tw, headStyle).slice(0, 2)) {
     drawText(cv, line, tx, baseline, headStyle);
-    baseline += 23.5;
+    baseline += 23;
   }
-  const deckStyle: TextStyle = { size: 13.5, weight: 2.7, color: [58, 56, 52] };
-  drawParagraph(cv, story.deck, tx, baseline - 16, tw, deckStyle, 18);
-  return yTop + artSize;
+  drawParagraph(cv, story.deckShort, tx, yTop + 72, tw, { size: 13.5, weight: 2.7, color: BODY }, 17);
 }
 
 function storyGrid(yTop: number): number {
   const gap = 28;
   const colW = (COLW - gap) / 2;
-  let y = yTop;
+  const cardH = 118;
   for (let row = 0; row < 2; row++) {
-    let rowBottom = y;
     for (let col = 0; col < 2; col++) {
-      const story = STORIES[row * 2 + col];
-      rowBottom = Math.max(rowBottom, storyCard(story, MARGIN + col * (colW + gap), y, colW));
+      storyCard(STORIES[row * 2 + col], MARGIN + col * (colW + gap), yTop + row * 118, colW);
     }
-    y = rowBottom + 20;
   }
-  return y;
+  return yTop + cardH + 118;
 }
 
-// The briefs: one line each, in two columns, tags in the section red.
+// The briefs, two columns of two: a bold tag inline, then the
+// one-liner flowing after it and underneath.
 function briefsBand(yTop: number): number {
-  drawText(cv, 'ALSO TODAY', MARGIN, yTop + 15, {
+  drawText(cv, 'ALSO TODAY', MARGIN, yTop + 16, {
     size: 14,
     weight: 4.4,
     color: RED,
     tracking: 2.5,
   });
-  cv.rule(MARGIN + 128, yTop + 10, COLW - 128, 1, FAINT);
-  const colW = (COLW - 28) / 2;
-  const tagStyle: TextStyle = { size: 13, weight: 4.6, color: INK, tracking: 0.8 };
-  const textStyle: TextStyle = { size: 13, weight: 2.7, color: [58, 56, 52] };
-  let y = yTop + 26;
-  for (let row = 0; row < 3; row++) {
-    let rowBottom = y;
-    for (let col = 0; col < 2; col++) {
-      const brief = BRIEFS[row * 2 + col];
-      const x = MARGIN + col * (colW + 28);
-      const tagW = drawText(cv, brief.tag, x, y + 13, tagStyle);
-      const bottom = drawParagraph(cv, brief.text, x + tagW + 10, y, colW - tagW - 10, textStyle, 17.5);
-      rowBottom = Math.max(rowBottom, bottom);
-    }
-    y = rowBottom + 9;
+  cv.rule(MARGIN + 128, yTop + 11, COLW - 128, 1, FAINT);
+  const gap = 28;
+  const colW = (COLW - gap) / 2;
+  const tagStyle: TextStyle = { size: 12.5, weight: 4.6, color: INK, tracking: 1 };
+  const textStyle: TextStyle = { size: 13.5, weight: 2.7, color: BODY };
+  let bottom = yTop;
+  for (let i = 0; i < BRIEFS.length; i++) {
+    const brief = BRIEFS[i];
+    const x = MARGIN + (i % 2) * (colW + gap);
+    const cellY = yTop + 24 + Math.floor(i / 2) * 42;
+    const tagW = drawText(cv, brief.tag, x, cellY + 13.5, tagStyle);
+    bottom = Math.max(bottom, drawParagraph(cv, brief.text, x + tagW + 9, cellY, colW - tagW - 9, textStyle, 17));
   }
-  return y;
+  return bottom;
 }
 
 // ---- Set the page -----------------------------------------------------
 let y = masthead();
-y = leadStory(y + 8);
-cv.rule(MARGIN, y, COLW, 1.6, INK);
-y = numbersBand(y + 12);
-cv.rule(MARGIN, y, COLW, 1, FAINT);
-y = storyGrid(y + 14);
-cv.rule(MARGIN, y, COLW, 1, FAINT);
-y = briefsBand(y + 12);
-cv.rule(MARGIN, Math.min(y + 4, H - 18), COLW, 2.4, INK);
+y = leadStory(y + 7);
+cv.rule(MARGIN, y + 8, COLW, 1.6, INK);
+y = numbersBand(y + 16);
+cv.rule(MARGIN, y + 8, COLW, 1, FAINT);
+y = storyGrid(y + 16);
+cv.rule(MARGIN, y + 8, COLW, 1, FAINT);
+y = briefsBand(y + 16);
+
+// A closing rule signs the page off.
+cv.rule(MARGIN, y + 11, COLW, 2.4, INK);
 
 const png = encodePng(cv.px, W, H);
 const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';

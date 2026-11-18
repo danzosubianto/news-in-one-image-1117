@@ -15,6 +15,7 @@ export interface Story {
   accent: Rgb; // the colour that section wears on the page
   headline: string;
   deck: string; // the short summary under the headline
+  deckShort: string; // the deck cut to two lines for the inside pages
   art: string; // which illustration in art.ts belongs to this story
 }
 
@@ -31,7 +32,8 @@ export const LEAD: Story = {
   headline: 'UKRAINE BLASTS KERCH BRIDGE FOR A SECOND DAY',
   deck:
     "Ukrainian missiles and drones partly collapsed a span of the Kerch Strait bridge, Crimea's lifeline to Russia, in a second straight day of strikes. " +
-    "President Zelensky hailed an 'unprecedented' attack planned over weeks; Moscow said its defences downed 1,441 drones overnight and halted all traffic across the bridge.",
+    "Zelensky hailed an 'unprecedented' attack; Moscow said it downed 1,441 drones.",
+  deckShort: '',
   art: 'bridge',
 };
 
@@ -42,6 +44,7 @@ export const STORIES: Story[] = [
     headline: 'MINES HIT MORE TANKERS IN THE STRAIT OF HORMUZ',
     deck:
       'Two more ships struck mines in the strait and a fourth tanker caught fire within 24 hours, as Iran warned vessels away from the American-patrolled route and Bahrain said it had thwarted a drone attack.',
+    deckShort: 'Two more ships hit mines; a fourth tanker burned in the strait.',
     art: 'ship',
   },
   {
@@ -50,22 +53,25 @@ export const STORIES: Story[] = [
     headline: 'TRUMP, XI AND PUTIN SET FIRST THREE-WAY SUMMIT',
     deck:
       'Donald Trump opened his Asia trip in Manila, meeting Quad leaders, before a first-ever trilateral summit with Xi Jinping and Vladimir Putin in Shenzhen on Thursday, with the Iran war and nuclear arsenals on the table.',
+    deckShort: 'Trump in Manila before a first summit with Xi and Putin Thursday.',
     art: 'globe',
   },
   {
     kicker: 'CLIMATE · COP31',
     accent: [43, 116, 58],
-    headline: 'COP31 DRAFT BIDS TO SPEED FOSSIL FUEL PHASE-OUT',
+    headline: 'COP31 DRAFT BIDS FASTER FOSSIL PHASE-OUT',
     deck:
       'Negotiators at the COP31 talks in Antalya published a draft deal calling for a faster end to fossil fuels and at least $120 billion a year in adaptation finance for developing countries by 2035.',
+    deckShort: 'Draft seeks faster fossil phase-out, $120bn a year for poor nations.',
     art: 'leaf',
   },
   {
     kicker: 'EUROPE · FRANCE',
     accent: [112, 62, 138],
-    headline: '146,000 MARCH ACROSS FRANCE IN STRIKE OVER PAY',
+    headline: 'FRANCE MARCHES: 146,000 IN STRIKE OVER PAY',
     deck:
       'Public-sector unions drew 146,000 people onto the streets - 28,000 of them in Paris - in a nationwide strike for higher wages, largely peaceful and aimed squarely at the government ahead of the 2027 election.',
+    deckShort: 'Unions draw 146,000 people, 28,000 in Paris, in a strike over pay.',
     art: 'tower',
   },
 ];
@@ -77,27 +83,19 @@ export interface Brief {
 export const BRIEFS: Brief[] = [
   {
     tag: 'SIBERIA',
-    text: 'Russian military transport plane crashes in the Kemerovo region; all 19 people aboard are killed',
+    text: 'Russian transport plane crashes in Siberia; all 19 aboard killed',
   },
   {
     tag: 'HEALTH',
-    text: 'United States loses its measles elimination status as cases pass 5,400, a 40-year high',
-  },
-  {
-    tag: 'JAPAN',
-    text: 'Fighter jets scrambled after two Russian aircraft violate Japanese airspace; Tokyo protests',
+    text: 'US loses measles elimination status; cases hit a 40-year high',
   },
   {
     tag: 'GAZA',
-    text: 'Britain, Australia, Canada and Italy urge Israel to open the crossings to humanitarian aid',
-  },
-  {
-    tag: 'YEMEN',
-    text: 'Government forces retreat toward Aden as Houthi fighters advance along the Red Sea coast',
+    text: 'UK, Australia, Canada and Italy urge Israel to open aid crossings',
   },
   {
     tag: 'SPORT',
-    text: 'India beat Pakistan by one wicket, off the very last ball, to win the Under-19 Asia Cup final',
+    text: 'India edge Pakistan by one wicket in last-ball U19 Asia Cup final',
   },
 ];
 
@@ -109,8 +107,8 @@ export interface Stat {
 }
 
 export const STATS: Stat[] = [
-  { value: '1,441', label: 'drones Moscow says its defences downed overnight' },
-  { value: '146,000', label: 'people march across France in the strike over pay' },
-  { value: '$120bn', label: 'a year in climate finance in the COP31 draft deal' },
-  { value: '5,400+', label: 'measles cases in the US as elimination status is lost' },
+  { value: '1,441', label: 'drones downed overnight' },
+  { value: '146,000', label: 'march in France' },
+  { value: '$120bn', label: 'climate finance a year' },
+  { value: '5,400+', label: 'US measles cases' },
 ];

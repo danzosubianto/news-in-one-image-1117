@@ -34,7 +34,7 @@ function burst(cv: Canvas, cx: number, cy: number, r: number, color: Rgb) {
 function drawBridge(cv: Canvas, x: number, y: number, w: number, h: number) {
   const ink: Rgb = [38, 44, 52];
   cv.rect(x, y, w, h, [206, 219, 226]); // pale sky
-  cv.circle(x + w * 0.82, y + h * 0.2, h * 0.09, [240, 200, 90]); // low sun
+  cv.circle(x + w * 0.1, y + h * 0.16, h * 0.08, [240, 200, 90]); // low sun, clear of the smoke
   const seaY = y + h * 0.68;
   cv.rect(x, seaY, w, y + h - seaY, [43, 96, 110]); // the strait
   // wavelets
@@ -48,10 +48,14 @@ function drawBridge(cv: Canvas, x: number, y: number, w: number, h: number) {
   // standing decks, left and right of the break
   cv.rect(x, deckY, w * 0.4, h * 0.05, ink);
   cv.rect(x + w * 0.66, deckY, w * 0.34, h * 0.05, ink);
-  // suspension cables fanning from the pylon tops
-  for (const px of [x + w * 0.177, x + w * 0.797]) {
-    for (const t of [0.02, 0.14, 0.26, 0.38]) {
-      cv.segment(px, deckY - h * 0.3, px - w * t * Math.sign(px - x - w / 2) * -1, deckY, 2, ink);
+  // cable stays fanning from each pylon top to its standing deck
+  const stays: [number, number[]][] = [
+    [x + w * 0.177, [-0.15, -0.05, 0.08, 0.18]],
+    [x + w * 0.797, [-0.1, 0.06, 0.16]],
+  ];
+  for (const [px, offsets] of stays) {
+    for (const dx of offsets) {
+      cv.segment(px, deckY - h * 0.3, px + dx * w, deckY, 1.8, ink);
     }
   }
   // the fallen span, tilted into the water
